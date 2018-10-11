@@ -55,6 +55,9 @@ $sites = call(compose(
     map($augResults($db))
 ), $db->getAllSites());
 
+$xSmall = '@media (max-width: 450px)';
+$small = '@media (max-width: 650px)';
+
 ?>
 <html lang="en">
     <head>
@@ -86,6 +89,18 @@ $sites = call(compose(
                 background: #f3f5f7;
             }
 
+            <?= $small; ?> {
+                body {
+                    padding: 20px;
+                }
+            }
+
+            <?= $xSmall; ?> {
+                body {
+                    padding: 0;
+                }
+            }
+
             h1,
             h2,
             h3,
@@ -112,6 +127,12 @@ $sites = call(compose(
                 background: white;
             }
 
+            <?= $small; ?> {
+                #content {
+                    padding: 20px 20px;
+                }
+            }
+
             #content > h1 {
                 margin-top: 0;
             }
@@ -122,15 +143,36 @@ $sites = call(compose(
                 margin-bottom: 20px;
             }
 
+            <?= $small; ?> {
+                .site {
+                    display: block;
+                    margin-bottom: 40px;
+                }
+            }
+
             .last-checked {
                 padding-left: 15px;
                 color: #555;
                 font-size: 14px;
             }
 
+            <?= $small; ?> {
+                .last-checked {
+                    padding-left: 0;
+                    margin-top: 3px;
+                }
+            }
+
             .results {
                 display: flex;
                 padding-left: 15px;
+            }
+
+            <?= $small; ?> {
+                .results {
+                    padding-left: 0;
+                    margin-top: 5px;
+                }
             }
 
             .results .result {
