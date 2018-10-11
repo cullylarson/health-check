@@ -10,8 +10,6 @@ use function Phugly\map;
 use function Phugly\glue;
 use function Phugly\setAt;
 
-$db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
-
 function esc($x) {
     return htmlspecialchars($x);
 }
@@ -51,6 +49,8 @@ $augResults = curry(function($db, $site) {
     return setAt('results', $db->getResults($site['id'], 20), $site);
 });
 
+$db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
+
 $sites = call(compose(
     map($augResults($db))
 ), $db->getAllSites());
@@ -87,9 +87,9 @@ $sites = call(compose(
             }
 
             h1,
-			h2,
-			h3,
-			h4 {
+            h2,
+            h3,
+            h4 {
                 font-family: 'Vollkorn', serif;
             }
 
