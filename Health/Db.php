@@ -12,7 +12,7 @@ class Db {
 
     public function getAllSites() {
         return $this->dbh
-            ->query('SELECT * from sites')
+            ->query('SELECT * from sites ORDER BY name ASC')
             ->fetchAll(\PDO::FETCH_ASSOC);
     }
 
