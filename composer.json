@@ -1,0 +1,12 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^2.5",
+        "cullylarson/phugly": "^1.5",
+        "zendframework/zend-mail": "^2.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Health\\": "Health/"
+        }
+    }
+}
