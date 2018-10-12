@@ -8,6 +8,7 @@ use function Phugly\compose;
 use function Phugly\curry;
 use function Phugly\map;
 use function Phugly\glue;
+use function Phugly\getAt;
 use function Phugly\setAt;
 
 function esc($x) {
@@ -45,14 +46,14 @@ $renderSite = function($site) {
     return ob_get_clean();
 };
 
-$augResults = curry(function($db, $site) {
-    return setAt('results', $db->getResults($site['id'], 20), $site);
+$augResults = curry(function($db, $numResults, $site) {
+    return setAt('results', $db->getResults($site['id'], $numResults), $site);
 });
 
 $db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
 
 $sites = call(compose(
-    map($augResults($db))
+    map($augResults($db, getAt('NUM_RESULTS', 20, $_ENV)))
 ), $db->getAllSites());
 
 $xSmall = '@media (max-width: 450px)';
