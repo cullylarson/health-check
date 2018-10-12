@@ -59,4 +59,15 @@ class Db {
 
         return $sth->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function getLastDownResult($siteId) {
+        $sth = $this->dbh
+            ->prepare("SELECT * from results WHERE siteId = :siteId AND isUp = FALSE ORDER BY created DESC LIMIT 1");
+
+        $sth->execute([
+            ':siteId' => $siteId,
+        ]);
+
+        return $sth->fetch(\PDO::FETCH_ASSOC);
+    }
 }

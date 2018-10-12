@@ -16,8 +16,16 @@ function esc($x) {
 }
 
 $renderSite = function($site) {
-    $renderResult = function($result) {
-        $className = $result['isUp'] ? 'is-up' : 'not-up';
+    $renderResult = function($result, $isLastDown = false) {
+        if(empty($result)) return '';
+
+        $className = call(compose(
+            glue(' '),
+            'array_filter'
+        ), [
+            $result['isUp'] ? 'is-up' : 'not-up',
+            $isLastDown ? 'last-down' : null,
+        ]);
 
         ob_start();
         ?>
@@ -39,6 +47,7 @@ $renderSite = function($site) {
                 glue(''),
                 map($renderResult)
             ), $site['results']); ?>
+            <?= $renderResult($site['lastDownResult'], true); ?>
         </div>
     </div>
     <?php
@@ -50,9 +59,14 @@ $augResults = curry(function($db, $numResults, $site) {
     return setAt('results', $db->getResults($site['id'], $numResults), $site);
 });
 
+$augLastDown = curry(function($db, $site) {
+    return setAt('lastDownResult', $db->getLastDownResult($site['id']), $site);
+});
+
 $db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
 
 $sites = call(compose(
+    map($augLastDown($db)),
     map($augResults($db, getAt('NUM_RESULTS', 20, $_ENV)))
 ), $db->getAllSites());
 
@@ -190,6 +204,21 @@ $small = '@media (max-width: 650px)';
 
             .results .result.not-up {
                 background: #f25255;
+            }
+
+            .results .result.last-down {
+                background: #fa868a;
+                margin-left: 10px;
+            }
+
+            .results .result.last-down:before {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 2px;
+                height: 100%;
+                background: #777;
+                left: -8px;
             }
 
             .results .result .result-text {
