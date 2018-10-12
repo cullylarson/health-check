@@ -64,14 +64,16 @@ SITE DOWN
     $transport->send($mail);
 });
 
-$siteIsUp = function($site) {
+$siteIsUp = function($timeout, $site) {
+    $timeout = (int) $timeout;
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $site['url']);
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_NOBODY, true); // don't need body
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
     curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
     $error = curl_errno($ch);
@@ -88,6 +90,6 @@ call(compose(
         $db->addResult($x['id'], $x['isUp']);
         return $x;
     }),
-    map(function($x) use ($siteIsUp) { return setAt('isUp', $siteIsUp($x), $x); }),
+    map(function($x) use ($siteIsUp) { return setAt('isUp', $siteIsUp(getAt('SITE_CHECK_TIMEOUT', 10, $_ENV), $x), $x); }),
     filter($shouldCheck($now, $checkFrequency))
 ), $db->getAllSites());
