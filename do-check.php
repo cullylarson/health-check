@@ -80,7 +80,6 @@ $checkSite = function($timeout, $site) {
     $error = curl_errno($ch);
     curl_close($ch);
 
-
     return [
         'isUp' => $error || $status === 200,
         'responseTime' => $responseTime,
