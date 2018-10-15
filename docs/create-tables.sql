@@ -14,6 +14,7 @@ CREATE TABLE results (
     id                  INT UNSIGNED    NOT NULL    AUTO_INCREMENT,
     siteId              INT UNSIGNED    NOT NULL,
     isUp                BOOLEAN,
+    responseTime        DECIMAL(9,6),
     created             DATETIME,
     PRIMARY KEY (id),
     FOREIGN KEY (siteId) REFERENCES sites (id)

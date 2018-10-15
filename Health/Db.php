@@ -16,7 +16,7 @@ class Db {
             ->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function addResult($siteId, $isUp) {
+    public function addResult($siteId, $isUp, $responseTime) {
         $isUp = $isUp
             ? 1
             : 0;
@@ -25,17 +25,18 @@ class Db {
 
         try {
             $this->dbh
-                ->prepare('UPDATE sites SET lastChecked = NOW(), lastIsUp = :isUp WHERE id = :siteId')
+                ->prepare('UPDATE sites SET lastChecked = NOW(), lastIsUp = :lastIsUp WHERE id = :siteId')
                 ->execute([
-                    ':isUp' => $isUp,
+                    ':lastIsUp' => $isUp,
                     ':siteId' => $siteId,
                 ]);
 
             $this->dbh
-                ->prepare('INSERT INTO results (siteId, isUp, created) VALUES (:siteId, :isUp, NOW())')
+                ->prepare('INSERT INTO results (siteId, isUp, responseTime, created) VALUES (:siteId, :isUp, :responseTime, NOW())')
                 ->execute([
                     ':siteId' => $siteId,
                     ':isUp' => $isUp,
+                    ':responseTime' => $responseTime,
                 ]);
 
             $this->dbh->commit();

@@ -38,10 +38,10 @@ $sendNotification = curry(function($emailTo, $emailFrom, $site) use ($compareBoo
     if(empty($emailTo) || empty($emailFrom)) return $site;
 
     // don't send if site is up
-    if($site['isUp']) return $site;
+    if($site['result']['isUp']) return $site;
 
     // if the isUp status matches the last isUp status, don't send a notification because one has already been sent
-    if($compareBoolish($site['isUp'], $site['lastIsUp'])) return $site;
+    if($compareBoolish($site['result']['isUp'], $site['lastIsUp'])) return $site;
 
     ob_start();
 ?>
@@ -64,7 +64,7 @@ SITE DOWN
     $transport->send($mail);
 });
 
-$siteIsUp = function($timeout, $site) {
+$checkSite = function($timeout, $site) {
     $timeout = (int) $timeout;
 
     $ch = curl_init();
@@ -76,10 +76,15 @@ $siteIsUp = function($timeout, $site) {
     curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
     curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $responseTime = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
     $error = curl_errno($ch);
     curl_close($ch);
 
-    return $error || $status === 200;
+
+    return [
+        'isUp' => $error || $status === 200,
+        'responseTime' => $responseTime,
+    ];
 };
 
 $db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
@@ -87,9 +92,9 @@ $db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
 call(compose(
     map($sendNotification(getenv('NOTIFY_EMAIL_TO'), getenv('NOTIFY_EMAIL_FROM'))),
     map(function($x) use ($db) {
-        $db->addResult($x['id'], $x['isUp']);
+        $db->addResult($x['id'], $x['result']['isUp'], $x['result']['responseTime']);
         return $x;
     }),
-    map(function($x) use ($siteIsUp) { return setAt('isUp', $siteIsUp(getAt('SITE_CHECK_TIMEOUT', 10, $_ENV), $x), $x); }),
+    map(function($x) use ($checkSite) { return setAt('result', $checkSite(getAt('SITE_CHECK_TIMEOUT', 10, $_ENV), $x), $x); }),
     filter($shouldCheck($now, $checkFrequency))
 ), $db->getAllSites());
