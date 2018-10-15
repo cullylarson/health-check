@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/autoload.php';
+require __DIR__ . '/init.php';
 
 use Zend\Mail;
 use Health\Db;
