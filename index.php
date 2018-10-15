@@ -27,10 +27,12 @@ $renderSite = function($site) {
             $isLastDown ? 'last-down' : null,
         ]);
 
+        $responseTime = empty($result['responseTime']) ? '' : '&nbsp;|&nbsp;' . esc($result['responseTime']) . 's';
+
         ob_start();
         ?>
         <div class='result <?= $className; ?>'>
-            <div class='result-text'><?= esc($result['created']); ?></div>
+            <div class='result-text'><?= esc($result['created']); ?><?= $responseTime; ?></div>
         </div>
         <?php
 
@@ -232,7 +234,7 @@ $small = '@media (max-width: 650px)';
                 border-radius: 3px;
                 font-size: 12px;
                 z-index: 1;
-                min-width: 125px;
+                min-width: 190px;
                 text-align: center;
             }
 
