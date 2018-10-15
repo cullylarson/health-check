@@ -21,9 +21,9 @@ class Db {
             ? 1
             : 0;
 
-        $this->dbh->beginTransaction();
-
         try {
+            $this->dbh->beginTransaction();
+
             $this->dbh
                 ->prepare('UPDATE sites SET lastChecked = NOW(), lastIsUp = :lastIsUp WHERE id = :siteId')
                 ->execute([
