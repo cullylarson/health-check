@@ -103,7 +103,7 @@ $small = '@media (max-width: 650px)';
                 margin: 0;
                 padding: 40px;
                 font-family: 'Roboto', sans-serif;
-                background: #f3f5f7;
+                background: #222;
             }
 
             <?= $small; ?> {
@@ -118,6 +118,10 @@ $small = '@media (max-width: 650px)';
                 }
             }
 
+            h1 {
+                color: #E33051;
+            }
+
             h1,
             h2,
             h3,
@@ -129,7 +133,7 @@ $small = '@media (max-width: 650px)';
             a:active,
             a:visited {
                 text-decoration: none;
-                color: #005eb3;
+                color: #6EAFBA;
             }
 
             a:hover {
@@ -141,12 +145,14 @@ $small = '@media (max-width: 650px)';
                 max-width: 100%;
                 margin: 0 auto;
                 padding: 40px 60px;
-                background: white;
+                background: #2f2f2f;
+                border-radius: 2px;
             }
 
             <?= $small; ?> {
                 #content {
                     padding: 20px 20px;
+                    border-radius: 0;
                 }
             }
 
@@ -169,7 +175,7 @@ $small = '@media (max-width: 650px)';
 
             .last-checked {
                 padding-left: 15px;
-                color: #555;
+                color: #E39922;
                 font-size: 14px;
             }
 
@@ -228,8 +234,8 @@ $small = '@media (max-width: 650px)';
                 position: absolute;
                 top: -28px;
                 left: -12px;
-                background: #ddd;
-                color: #857587;
+                background: #8F7A6A;
+                color: #E1DFDF;
                 padding: 3px;
                 border-radius: 3px;
                 font-size: 12px;
@@ -244,7 +250,7 @@ $small = '@media (max-width: 650px)';
                 position: absolute;
                 left: 12px;
                 bottom: -3px;
-                background: #ddd;
+                background: #8F7A6A;
                 width: 10px;
                 height: 10px;
                 transform: rotate(45deg);
