@@ -71,16 +71,9 @@ $renderSite = curry(function($numResults, $site) {
         ob_start();
         ?>
         <div class='chart' id='<?= $chartId; ?>'>
-            <div class='chart-toggle'>Chart</div>
             <div class='chart-container'></div>
         </div>
         <script>
-            (() => {
-                const chartEl = document.querySelector('#<?= $chartId; ?>')
-                const toggleEl = chartEl.querySelector('.chart-toggle')
-                toggleEl.addEventListener('click', () => chartEl.classList.toggle('is-open'))
-            })()
-
             new Chartist.Line('#<?= $chartId; ?> .chart-container', {
                     // labels: <?= $labelsJson; ?>,
                     series: [<?= $responseTimesJson; ?>],
@@ -122,10 +115,13 @@ $renderSite = curry(function($numResults, $site) {
         return ob_get_clean();
     };
 
+    $siteElId = 'site-' . randStr(12);
+
     ob_start();
     ?>
-    <div class='site'>
+    <div class='site' id='<?= $siteElId; ?>'>
         <div class='site-summary'>
+            <div class='details-toggle'></div>
             <div class='name'><a href='<?= $site['url']; ?>'><?= esc($site['name']); ?></a></div>
             <div class='last-checked'><?= esc($site['lastChecked']); ?></div>
             <div class='results'>
@@ -137,8 +133,18 @@ $renderSite = curry(function($numResults, $site) {
                 <?= $renderResult($site['lastDownResult'], true); ?>
             </div>
         </div>
-        <?= $renderChart($site); ?>
+        <div class='details'>
+            <?= $renderChart($site); ?>
+        </div>
     </div>
+    <script>
+        (() => {
+            const siteEl = document.querySelector('#<?= $siteElId; ?>')
+            const toggleEl = siteEl.querySelector('.details-toggle')
+            toggleEl.addEventListener('click', () => siteEl.classList.toggle('is-open'))
+        })()
+    </script>
+
     <?php
 
     return ob_get_clean();
@@ -253,7 +259,6 @@ $small = '@media (max-width: 650px)';
             }
 
             .site {
-                margin-bottom: 20px;
             }
 
             <?= $small; ?> {
@@ -360,31 +365,39 @@ $small = '@media (max-width: 650px)';
                 display: block;
             }
 
-            .chart-toggle {
-                display: inline-block;
+            .details-toggle {
                 cursor: pointer;
                 user-select: none;
-                margin-top: 5px;
-                background: #DBC07B;
-                color: #555;
-                border-radius: 3px;
-                padding: 3px 5px;
-                font-size: 12px;
+                padding: 10px 10px 10px 0;
             }
 
-            .chart .chart-container {
-                transition: max-height 300ms ease;
+            .details-toggle:after {
+                content: '';
+                display: block;
+                border-right: 2px solid #555;
+                border-bottom: 2px solid #555;
+                transform: rotate(45deg);
+                width: 8px;
+                height: 8px;
+                transition: all 300ms ease;
+                position: relative;
+                top: -2px;
+            }
+
+            .site.is-open .details-toggle:after {
+                transform: rotate(-135deg);
+                top: 2px;
+            }
+
+            .details {
+                transition: all 300ms ease;
                 max-height: 0;
                 overflow: hidden;
-                padding-top: 10px;
             }
 
-            .chart.is-open .chart-container {
+            .site.is-open .details {
                 max-height: 200px;
-            }
-
-            .chart-toggle {
-                
+                padding-top: 10px;
             }
 
             .ct-grid {
