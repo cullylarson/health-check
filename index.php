@@ -37,12 +37,19 @@ $renderSite = curry(function($numResults, $site) {
             $isLastDown ? 'last-down' : null,
         ]);
 
-        $responseTime = empty($result['responseTime']) ? '' : '&nbsp;|&nbsp;' . esc($result['responseTime']) . 's';
+        $resultText = call(compose(
+            glue('&nbsp;|&nbsp;'),
+            'array_filter'
+        ), [
+            esc($result['created']),
+            empty($result['responseTime']) ? null : esc($result['responseTime']),
+            empty($result['status']) ? null : esc($result['status']),
+        ]);
 
         ob_start();
         ?>
         <div class='result <?= $className; ?>'>
-            <div class='result-text'><?= esc($result['created']); ?><?= $responseTime; ?></div>
+            <div class='result-text'><?= $resultText; ?></div>
         </div>
         <?php
 
@@ -61,9 +68,18 @@ $renderSite = curry(function($numResults, $site) {
         $responseTimesJson = call(compose(
             'json_encode',
             map(function($x) {
+                $meta = call(compose(
+                    glue(' | '),
+                    'array_filter'
+                ), [
+                    esc($x['created']),
+                    empty($x['responseTime']) ? null : esc($x['responseTime']),
+                    empty($x['status']) ? null : esc($x['status']),
+                ]);
+
                 return [
                     'value' => getAt('responseTime', 0, $x),
-                    'meta' => getAt('created', '', $x) . ' | ' . getAt('responseTime', 0, $x),
+                    'meta' => $meta,
                 ];
             })
         ), $site['results']);
