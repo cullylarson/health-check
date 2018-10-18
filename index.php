@@ -365,15 +365,21 @@ $small = '@media (max-width: 650px)';
                 display: block;
             }
 
+            .toggle-all,
             .details-toggle {
                 cursor: pointer;
                 user-select: none;
                 padding: 10px 10px 10px 0;
             }
 
+            .toggle-all {
+                padding: 10px;
+            }
+
+            .toggle-all:after,
             .details-toggle:after {
                 content: '';
-                display: block;
+                display: inline-block;
                 border-right: 2px solid #555;
                 border-bottom: 2px solid #555;
                 transform: rotate(45deg);
@@ -384,6 +390,7 @@ $small = '@media (max-width: 650px)';
                 top: -2px;
             }
 
+            .toggle-all.is-open:after,
             .site.is-open .details-toggle:after {
                 transform: rotate(-135deg);
                 top: 2px;
@@ -456,7 +463,19 @@ $small = '@media (max-width: 650px)';
     </head>
     <body>
         <div id="content">
-            <h1>Health Check</h1>
+            <h1>Health Check <span class='toggle-all'></span></h1>
+
+            <script>
+                (() => {
+                    const toggleEl = document.querySelector('.toggle-all')
+                    toggleEl.addEventListener('click', () => {
+                        const isOpen = toggleEl.classList.contains('is-open')
+                        if(isOpen) document.querySelectorAll('.site').forEach(x => x.classList.remove('is-open'))
+                        else document.querySelectorAll('.site').forEach(x => x.classList.add('is-open'))
+                        toggleEl.classList.toggle('is-open')                      
+                    })
+                })()
+            </script>
 
             <?= call(compose(
                 glue(''),
