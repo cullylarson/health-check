@@ -15,6 +15,8 @@ CREATE TABLE results (
     siteId              INT UNSIGNED    NOT NULL,
     isUp                BOOLEAN,
     responseTime        DECIMAL(9,6),
+    status              SMALLINT UNSIGNED,
+    error               TEXT,
     created             DATETIME,
     PRIMARY KEY (id),
     FOREIGN KEY (siteId) REFERENCES sites (id)

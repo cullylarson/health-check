@@ -16,7 +16,7 @@ class Db {
             ->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function addResult($siteId, $isUp, $responseTime) {
+    public function addResult($siteId, $isUp, $responseTime, $status, $error) {
         $isUp = $isUp
             ? 1
             : 0;
@@ -32,11 +32,13 @@ class Db {
                 ]);
 
             $this->dbh
-                ->prepare('INSERT INTO results (siteId, isUp, responseTime, created) VALUES (:siteId, :isUp, :responseTime, NOW())')
+                ->prepare('INSERT INTO results (siteId, isUp, responseTime, status, error, created) VALUES (:siteId, :isUp, :responseTime, :status, :error, NOW())')
                 ->execute([
                     ':siteId' => $siteId,
                     ':isUp' => $isUp,
                     ':responseTime' => $responseTime,
+                    ':status' => $status,
+                    ':error' => $error,
                 ]);
 
             $this->dbh->commit();

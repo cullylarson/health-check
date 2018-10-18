@@ -77,12 +77,15 @@ $checkSite = function($timeout, $site) {
     curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
     $responseTime = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
-    $error = curl_errno($ch);
+    $errorNumber = curl_errno($ch);
+    $errorMessage = curl_error($ch);
     curl_close($ch);
 
     return [
-        'isUp' => $error || $status === 200,
+        'isUp' => !$errorNumber && $status === 200,
         'responseTime' => $responseTime,
+        'error' => $errorNumber === 0 ? null : "${errorNumber} -- ${errorMessage}",
+        'status' => $status,
     ];
 };
 
@@ -91,7 +94,8 @@ $db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
 call(compose(
     map($sendNotification(getenv('NOTIFY_EMAIL_TO'), getenv('NOTIFY_EMAIL_FROM'))),
     map(function($x) use ($db) {
-        $db->addResult($x['id'], $x['result']['isUp'], $x['result']['responseTime']);
+        $r = $x['result'];
+        $db->addResult($x['id'], $r['isUp'], $r['responseTime'], $r['status'], $r['error']);
         return $x;
     }),
     map(function($x) use ($checkSite) { return setAt('result', $checkSite(getAt('SITE_CHECK_TIMEOUT', 10, $_ENV), $x), $x); }),
