@@ -4,6 +4,7 @@ require __DIR__ . '/init.php';
 
 use Zend\Mail;
 use Health\Db;
+use Phugly as F;
 use function Phugly\call;
 use function Phugly\compose;
 use function Phugly\map;
@@ -11,6 +12,7 @@ use function Phugly\filter;
 use function Phugly\curry;
 use function Phugly\getAt;
 use function Phugly\setAt;
+use function Phugly\ifElse;
 
 $checkFrequency = new \DateInterval('PT5M');
 $now = new \DateTimeImmutable();
@@ -89,6 +91,27 @@ $checkSite = function($timeout, $site) {
     ];
 };
 
+// retry the check for any sites that failed
+$retryCheck = map(
+    ifElse(
+        function($x) { return !getAt(['result', 'isUp'], true, $x); },
+        function($x) use ($checkSite) { return setAt('result', $checkSite(getAt('SITE_CHECK_TIMEOUT', 10, $_ENV), $x), $x); },
+        F\id
+    )
+);
+
+// wait for a bit if any sites are down so we can do a retry
+$waitIfDown = curry(function($waitSeconds, $infos) {
+    $haveDown = call(compose(
+        function($x) { return count($x) > 0; },
+        filter(function($x) { return !getAt(['result', 'isUp'], true, $x); })
+    ), $infos);
+
+    if($haveDown) sleep($waitSeconds);
+
+    return $infos;
+});
+
 $db = new Db(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASS'));
 
 call(compose(
@@ -98,6 +121,8 @@ call(compose(
         $db->addResult($x['id'], $r['isUp'], $r['responseTime'], $r['status'], $r['error']);
         return $x;
     }),
+    $retryCheck,
+    $waitIfDown(30),
     map(function($x) use ($checkSite) { return setAt('result', $checkSite(getAt('SITE_CHECK_TIMEOUT', 10, $_ENV), $x), $x); }),
     filter($shouldCheck($now, $checkFrequency))
 ), $db->getAllSites());
