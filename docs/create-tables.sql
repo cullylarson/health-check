@@ -5,6 +5,7 @@ CREATE TABLE sites (
     description         TEXT,
     lastIsUp            BOOLEAN         NOT NULL    DEFAULT TRUE,
     lastChecked         DATETIME,
+    enabled             BOOLEAN         NOT NULL    DEFAULT TRUE,
     created             DATETIME,
     modified            DATETIME,
     PRIMARY KEY (id)
